@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Image from "next/image";
 
 function PhotoFrame({
@@ -65,37 +66,43 @@ function Book({ children, mood = "paper", className = "" }) {
 
 function MobileSheet({ page, isFirst, onOpen, noteVariant = "sticky" }) {
   const photos = page.images;
-  const count = photos.length;
-  const gridClass =
-    count <= 1
-      ? "grid-cols-1 grid-rows-1"
-      : count === 2
-        ? "grid-cols-2 grid-rows-1"
-        : "grid-cols-2 grid-rows-2";
+  const [active, setActive] = useState(0);
+  const image = photos[Math.min(active, photos.length - 1)];
 
   return (
-    <div className="mobile-spread flex h-full min-h-0 flex-1 flex-col gap-1.5 overflow-hidden px-2 py-2 lg:hidden">
-      <div className={`grid min-h-0 flex-1 gap-1.5 ${gridClass}`}>
-        {photos.map((image, i) => (
-          <div
-            key={image.src}
-            className={`relative min-h-0 ${count >= 3 && i === 2 ? "col-span-2" : ""}`}
-          >
-            <PhotoFrame
-              image={image}
-              variant="polaroid"
-              tilt={0}
-              priority={isFirst && i === 0}
-              onOpen={onOpen}
-              sizes="46vw"
+    <div className="mobile-spread flex h-full min-h-0 flex-1 flex-col gap-2 overflow-hidden px-2 py-2 lg:hidden">
+      {image ? (
+        <div className="relative min-h-0 flex-1">
+          <PhotoFrame
+            image={image}
+            variant="polaroid"
+            tilt={0}
+            priority={isFirst}
+            onOpen={onOpen}
+            sizes="100vw"
+          />
+        </div>
+      ) : null}
+      {photos.length > 1 ? (
+        <div className="flex shrink-0 items-center justify-center gap-2 py-0.5">
+          {photos.map((photo, i) => (
+            <button
+              key={photo.src}
+              type="button"
+              aria-label={`Show photo ${i + 1}`}
+              aria-pressed={i === active}
+              onClick={() => setActive(i)}
+              className={`h-2.5 rounded-full transition duration-200 ${
+                i === active ? "w-6 bg-ink" : "w-2.5 bg-ink/30"
+              }`}
             />
-          </div>
-        ))}
-      </div>
+          ))}
+        </div>
+      ) : null}
       <NoteCard
         page={page}
         variant={noteVariant}
-        className="mobile-album-note max-h-[30%] shrink-0 overflow-y-auto"
+        className="mobile-album-note max-h-[28%] shrink-0 overflow-y-auto"
       />
     </div>
   );

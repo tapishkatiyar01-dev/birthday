@@ -1,7 +1,6 @@
 "use client";
 
 import { useMemo, useRef, useState } from "react";
-import Image from "next/image";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { Observer } from "gsap/Observer";
@@ -276,7 +275,7 @@ export default function PhotoAlbum({ pages }) {
             tolerance: 64,
             dragMinimum: 48,
             preventDefault: false,
-            ignore: "button, a, [role='tab'], [role='dialog'], .album-note, .album-nav-btn",
+            ignore: "button, a, [role='tab'], [role='dialog'], .album-note, .album-nav-btn, .polaroid-wrap, .photo-frame",
             onLeft: goNext,
             onRight: goPrev,
           });
@@ -328,7 +327,7 @@ export default function PhotoAlbum({ pages }) {
   return (
     <main
       ref={rootRef}
-      className="page-shell flex min-h-dvh flex-col overflow-hidden"
+      className="page-shell flex h-dvh min-h-0 flex-col overflow-hidden"
     >
       <div className="hidden lg:block">
         <PartyDecor variant="album" />
@@ -354,8 +353,8 @@ export default function PhotoAlbum({ pages }) {
           </h1>
         </div>
 
-        <div className="relative mx-auto min-h-0 w-full min-w-0 max-w-6xl flex-1">
-          <div className="relative h-full min-h-0 min-w-0 w-full lg:min-h-[40rem]">
+        <div className="relative mx-auto flex min-h-0 w-full min-w-0 max-w-6xl flex-1 flex-col">
+          <div className="relative min-h-0 w-full min-w-0 flex-1 lg:min-h-[40rem]">
             {albumPages.map((page, i) => (
               <div
                 key={page.id}
@@ -450,27 +449,26 @@ export default function PhotoAlbum({ pages }) {
           role="dialog"
           aria-modal="true"
           aria-label={lightbox.alt}
-          className="fixed inset-0 z-40 flex items-center justify-center bg-ink/88 px-4 py-8"
+          className="fixed inset-0 z-50 flex items-center justify-center bg-ink/92 px-3 py-16"
           onClick={closePhoto}
         >
           <button
             type="button"
             onClick={closePhoto}
-            className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] inline-flex min-h-11 cursor-pointer items-center rounded-full border border-paper/25 px-4 text-sm text-paper transition duration-200 hover:border-champagne hover:text-champagne"
+            className="absolute right-4 top-[max(1rem,env(safe-area-inset-top))] z-10 inline-flex min-h-11 cursor-pointer items-center rounded-full border border-paper/25 px-4 text-sm text-paper transition duration-200 hover:border-champagne hover:text-champagne"
             aria-label="Close photo"
           >
             Close
           </button>
           <div
-            className="relative h-[min(82dvh,46rem)] w-full max-w-3xl"
+            className="flex max-h-[88dvh] w-full max-w-3xl items-center justify-center"
             onClick={(event) => event.stopPropagation()}
           >
-            <Image
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={lightbox.src}
               alt={lightbox.alt}
-              fill
-              className="object-contain"
-              sizes="90vw"
+              className="max-h-[88dvh] w-auto max-w-full object-contain"
             />
           </div>
         </div>
