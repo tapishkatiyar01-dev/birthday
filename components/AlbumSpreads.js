@@ -1,16 +1,11 @@
 "use client";
 
-import { useState } from "react";
-import Image from "next/image";
-
 function PhotoFrame({
   image,
   variant = "polaroid",
   className = "",
   tilt = 0,
-  priority = false,
   onOpen,
-  sizes,
 }) {
   return (
     <div className={`polaroid-wrap h-full w-full ${className}`}>
@@ -21,15 +16,13 @@ function PhotoFrame({
           className={`photo-frame frame-${variant} group h-full w-full cursor-pointer text-left`}
           aria-label={`Open ${image.alt}`}
         >
-          <span className="photo-frame-inner relative block h-full w-full overflow-hidden">
-            <Image
+          <span className="photo-frame-inner relative flex h-full w-full items-center justify-center overflow-hidden">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
               src={image.src}
               alt={image.alt}
-              fill
-              priority={priority}
-              sizes={sizes}
               draggable={false}
-              className="object-contain object-center transition duration-200 ease-[cubic-bezier(.25,.46,.45,.94)] group-active:scale-[0.99]"
+              className="photo-frame-img"
             />
           </span>
         </button>
@@ -66,43 +59,37 @@ function Book({ children, mood = "paper", className = "" }) {
 
 function MobileSheet({ page, isFirst, onOpen, noteVariant = "sticky" }) {
   const photos = page.images;
-  const [active, setActive] = useState(0);
-  const image = photos[Math.min(active, photos.length - 1)];
+  const count = photos.length;
+  const gridClass =
+    count <= 1
+      ? "grid-cols-1 grid-rows-1"
+      : count === 2
+        ? "grid-cols-2 grid-rows-1"
+        : "grid-cols-2 grid-rows-2";
 
   return (
     <div className="mobile-spread flex h-full min-h-0 flex-1 flex-col gap-2 overflow-hidden px-2 py-2 lg:hidden">
-      {image ? (
-        <div className="relative min-h-0 flex-1">
-          <PhotoFrame
-            image={image}
-            variant="polaroid"
-            tilt={0}
-            priority={isFirst}
-            onOpen={onOpen}
-            sizes="100vw"
-          />
-        </div>
-      ) : null}
-      {photos.length > 1 ? (
-        <div className="flex shrink-0 items-center justify-center gap-2 py-0.5">
-          {photos.map((photo, i) => (
-            <button
-              key={photo.src}
-              type="button"
-              aria-label={`Show photo ${i + 1}`}
-              aria-pressed={i === active}
-              onClick={() => setActive(i)}
-              className={`h-2.5 rounded-full transition duration-200 ${
-                i === active ? "w-6 bg-ink" : "w-2.5 bg-ink/30"
-              }`}
+      <div className={`grid min-h-0 flex-1 gap-2 ${gridClass}`}>
+        {photos.map((image, i) => (
+          <div
+            key={image.src}
+            className={`relative min-h-0 ${count >= 3 && i === 2 ? "col-span-2" : ""}`}
+          >
+            <PhotoFrame
+              image={image}
+              variant="polaroid"
+              tilt={0}
+              priority={isFirst && i === 0}
+              onOpen={onOpen}
+              sizes={count === 1 ? "100vw" : "50vw"}
             />
-          ))}
-        </div>
-      ) : null}
+          </div>
+        ))}
+      </div>
       <NoteCard
         page={page}
         variant={noteVariant}
-        className="mobile-album-note max-h-[28%] shrink-0 overflow-y-auto"
+        className="mobile-album-note max-h-[26%] shrink-0 overflow-y-auto"
       />
     </div>
   );
