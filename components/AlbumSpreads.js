@@ -10,26 +10,42 @@ function PhotoFrame({
   priority = false,
   onOpen,
   sizes,
+  natural = false,
 }) {
   return (
-    <div className={`polaroid-wrap h-full w-full ${className}`}>
-      <div className="h-full w-full" style={{ transform: tilt ? `rotate(${tilt}deg)` : undefined }}>
+    <div className={`polaroid-wrap w-full ${natural ? "" : "h-full"} ${className}`}>
+      <div className={natural ? "w-full" : "h-full w-full"} style={{ transform: tilt ? `rotate(${tilt}deg)` : undefined }}>
         <button
           type="button"
           onClick={() => onOpen(image)}
-          className={`photo-frame frame-${variant} group h-full w-full cursor-pointer text-left`}
+          className={`photo-frame frame-${variant} group w-full cursor-pointer text-left ${natural ? "h-auto" : "h-full"}`}
           aria-label={`Open ${image.alt}`}
         >
-          <span className="photo-frame-inner relative block h-full w-full overflow-hidden">
-            <Image
-              src={image.src}
-              alt={image.alt}
-              fill
-              priority={priority}
-              sizes={sizes}
-              draggable={false}
-              className="object-contain object-center transition duration-200 ease-[cubic-bezier(.25,.46,.45,.94)] group-active:scale-[0.99]"
-            />
+          <span
+            className={`photo-frame-inner relative block w-full overflow-hidden ${
+              natural ? "photo-frame-inner--natural h-auto flex-none" : "h-full"
+            }`}
+          >
+            {natural ? (
+              // Native img keeps the real photo ratio on mobile (Next/Image fill cannot).
+              // eslint-disable-next-line @next/next/no-img-element
+              <img
+                src={image.src}
+                alt={image.alt}
+                draggable={false}
+                className="block h-auto w-full object-contain object-center"
+              />
+            ) : (
+              <Image
+                src={image.src}
+                alt={image.alt}
+                fill
+                priority={priority}
+                sizes={sizes}
+                draggable={false}
+                className="object-contain object-center transition duration-200 ease-[cubic-bezier(.25,.46,.45,.94)] group-active:scale-[0.99]"
+              />
+            )}
           </span>
         </button>
       </div>
@@ -65,27 +81,20 @@ function Book({ children, mood = "paper", className = "" }) {
 
 function MobileSheet({ page, isFirst, onOpen, noteVariant = "sticky" }) {
   const photos = page.images;
-  const three = photos.length >= 3;
 
   return (
     <div className="mobile-spread flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 py-3 lg:hidden">
-      <div className={`grid gap-2.5 ${three ? "grid-cols-2" : "grid-cols-2"}`}>
+      <div className="flex flex-col gap-3">
         {photos.map((image, i) => (
-          <div
-            key={image.src}
-            className={
-              three && i === 0
-                ? "relative col-span-2 aspect-[16/10]"
-                : "relative aspect-[4/5]"
-            }
-          >
+          <div key={image.src} className="relative w-full">
             <PhotoFrame
+              natural
               image={image}
-              variant={i === 0 && three ? "flush" : "polaroid"}
+              variant="polaroid"
               tilt={0}
               priority={isFirst && i === 0}
               onOpen={onOpen}
-              sizes="(max-width: 1024px) 92vw, 40vw"
+              sizes="92vw"
             />
           </div>
         ))}
@@ -137,23 +146,7 @@ function LayoutPile({ page, isFirst, onOpen }) {
 function LayoutFilm({ page, isFirst, onOpen }) {
   return (
     <Book mood="cinema" className="lg:px-8 lg:py-7">
-      <div className="mobile-spread flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 py-3 lg:hidden">
-        <div className="film-strip mx-auto flex w-full max-w-sm gap-2 overflow-x-auto p-2">
-          {page.images.map((image, i) => (
-            <div key={image.src} className="relative h-44 w-36 shrink-0">
-              <PhotoFrame
-                image={image}
-                variant="film"
-                tilt={0}
-                priority={isFirst && i === 0}
-                onOpen={onOpen}
-                sizes="30vw"
-              />
-            </div>
-          ))}
-        </div>
-        <NoteCard page={page} variant="lined" className="shrink-0" />
-      </div>
+      <MobileSheet page={page} isFirst={isFirst} onOpen={onOpen} noteVariant="lined" />
       <div className="desktop-spread hidden min-h-0 flex-1 grid-cols-[minmax(0,0.72fr)_minmax(0,1fr)] items-center gap-5 px-8 py-7 lg:grid">
         <div className="film-strip mx-auto flex h-[min(56dvh,32rem)] w-full max-w-[13.5rem] flex-col gap-2 p-2">
           {page.images.map((image, i) => (

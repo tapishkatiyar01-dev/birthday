@@ -5,13 +5,14 @@ import Link from "next/link";
 import gsap from "gsap";
 import { useGSAP } from "@gsap/react";
 import { content } from "@/lib/content";
-import { isGiftUnlocked, unlockGiftSession } from "@/lib/session";
+import { isGiftUnlocked, unlockGiftSession, lockGiftSession } from "@/lib/session";
+import { isViewExpired, remainingAccessMs } from "@/lib/view-access";
 import PartyDecor from "@/components/PartyDecor";
 
 gsap.registerPlugin(useGSAP);
 
 const HUB_LINKS = [
-  { href: "/gallery", label: "Gallery", hint: "Our moments" },
+  { href: "/gallery", label: "Gallery", hint: "Our memories" },
   { href: "/note", label: "Birthday note", hint: "A few words for you" },
   { href: "/video", label: "Video", hint: "Press play" },
   { href: "/qr", label: "Surprise QR", hint: "Scan or tap" },
@@ -52,10 +53,19 @@ function ConfettiLayer({ count = 36 }) {
 
 export default function BirthdayExperience() {
   const rootRef = useRef(null);
+  const lockTimerRef = useRef(null);
   const [phase, setPhase] = useState("loading"); // loading | locked | party | warning | hub
   const [showNext, setShowNext] = useState(false);
   const [busy, setBusy] = useState(false);
   const [error, setError] = useState("");
+
+  function armLock(viewedAt) {
+    clearTimeout(lockTimerRef.current);
+    lockTimerRef.current = setTimeout(() => {
+      lockGiftSession();
+      setPhase("locked");
+    }, remainingAccessMs(viewedAt));
+  }
 
   useEffect(() => {
     let cancelled = false;
@@ -66,12 +76,19 @@ export default function BirthdayExperience() {
         const data = await res.json();
         if (cancelled) return;
 
+        if (data.viewed && isViewExpired(data.viewedAt)) {
+          lockGiftSession();
+          setPhase("locked");
+          return;
+        }
+
         if (data.viewed && !isGiftUnlocked()) {
           setPhase("locked");
           return;
         }
         if (isGiftUnlocked()) {
           setPhase("hub");
+          armLock(data.viewedAt);
           return;
         }
         setPhase("party");
@@ -86,6 +103,7 @@ export default function BirthdayExperience() {
     boot();
     return () => {
       cancelled = true;
+      clearTimeout(lockTimerRef.current);
     };
   }, []);
 
@@ -247,6 +265,7 @@ export default function BirthdayExperience() {
       const data = await res.json();
 
       if (data.alreadyViewed) {
+        lockGiftSession();
         setPhase("locked");
         return;
       }
@@ -256,6 +275,7 @@ export default function BirthdayExperience() {
         if (res.status >= 500) {
           unlockGiftSession();
           setPhase("hub");
+          armLock(new Date());
           return;
         }
         setError("Something went wrong. Please try again.");
@@ -264,9 +284,11 @@ export default function BirthdayExperience() {
 
       unlockGiftSession();
       setPhase("hub");
+      armLock(data.viewedAt ?? new Date());
     } catch {
       unlockGiftSession();
       setPhase("hub");
+      armLock(new Date());
     } finally {
       setBusy(false);
     }

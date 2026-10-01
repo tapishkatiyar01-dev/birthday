@@ -221,9 +221,17 @@ button {
   background: rgba(14, 21, 32, 0.1);
 }
 
-.photo-frame-inner img {
+.photo-frame-inner--natural {
+  flex: none;
+}
+
+.photo-frame-inner--natural img {
+  position: static !important;
+  inset: auto !important;
+  width: 100% !important;
+  height: auto !important;
+  max-height: min(72dvh, 36rem);
   object-fit: contain !important;
-  object-position: center;
 }
 
 .frame-polaroid {

@@ -2,7 +2,8 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
-import { isGiftUnlocked } from "@/lib/session";
+import { isGiftUnlocked, lockGiftSession } from "@/lib/session";
+import { isViewExpired, remainingAccessMs } from "@/lib/view-access";
 
 /**
  * Ensures the visitor opened the gift in this browser session.
@@ -13,11 +14,41 @@ export default function RequireUnlock({ children }) {
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    if (!isGiftUnlocked()) {
-      router.replace("/");
-      return;
+    let cancelled = false;
+    let timer;
+
+    async function gate() {
+      if (!isGiftUnlocked()) {
+        router.replace("/");
+        return;
+      }
+
+      try {
+        const res = await fetch("/api/view");
+        const data = await res.json();
+        if (cancelled) return;
+
+        if (data.viewed && isViewExpired(data.viewedAt)) {
+          lockGiftSession();
+          router.replace("/");
+          return;
+        }
+
+        setReady(true);
+        timer = setTimeout(() => {
+          lockGiftSession();
+          router.replace("/");
+        }, remainingAccessMs(data.viewedAt));
+      } catch {
+        if (!cancelled) setReady(true);
+      }
     }
-    setReady(true);
+
+    gate();
+    return () => {
+      cancelled = true;
+      clearTimeout(timer);
+    };
   }, [router]);
 
   if (!ready) {

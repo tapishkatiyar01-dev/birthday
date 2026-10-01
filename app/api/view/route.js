@@ -4,7 +4,10 @@ export async function GET() {
   try {
     const collection = await getViewCollection();
     const doc = await collection.findOne({ _id: VIEW_DOC_ID });
-    return Response.json({ viewed: Boolean(doc?.viewed) });
+    return Response.json({
+      viewed: Boolean(doc?.viewed),
+      viewedAt: doc?.viewedAt ?? null,
+    });
   } catch (error) {
     console.error("GET /api/view failed:", error);
     return Response.json(
@@ -31,8 +34,13 @@ export async function POST() {
       { returnDocument: "after" }
     );
 
-    if (result) {
-      return Response.json({ ok: true, alreadyViewed: false });
+    const doc = result?.value ?? result;
+    if (doc) {
+      return Response.json({
+        ok: true,
+        alreadyViewed: false,
+        viewedAt: doc.viewedAt ?? now,
+      });
     }
 
     return Response.json({ ok: false, alreadyViewed: true });
