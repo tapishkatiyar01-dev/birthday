@@ -10,7 +10,7 @@ import AlbumSpread from "@/components/AlbumSpreads";
 
 gsap.registerPlugin(useGSAP, Observer);
 
-const CLOSING_NOTE = "In a year I can only make this much memory😤😂";
+const CLOSING_NOTE = "In a year I can only make this much memory😤😂\n Kitna next next kroge";
 
 function Chevron({ direction }) {
   const isPrev = direction === "prev";
