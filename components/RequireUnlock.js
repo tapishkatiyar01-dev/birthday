@@ -4,6 +4,8 @@ import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { isGiftUnlocked, lockGiftSession } from "@/lib/session";
 import { isViewExpired, remainingAccessMs } from "@/lib/view-access";
+import { content } from "@/lib/content";
+import { prefetchGiftVideo } from "@/lib/prefetch-video";
 
 /**
  * Ensures the visitor opened the gift in this browser session.
@@ -26,6 +28,7 @@ export default function RequireUnlock({ children }) {
       }
 
       setReady(true);
+      prefetchGiftVideo(content.videoSrc);
 
       try {
         const res = await fetch("/api/view", {

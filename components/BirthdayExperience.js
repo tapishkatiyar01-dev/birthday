@@ -8,6 +8,7 @@ import { content } from "@/lib/content";
 import { isGiftUnlocked, unlockGiftSession, lockGiftSession } from "@/lib/session";
 import { isViewExpired, remainingAccessMs } from "@/lib/view-access";
 import PartyDecor from "@/components/PartyDecor";
+import { prefetchGiftVideo } from "@/lib/prefetch-video";
 
 gsap.registerPlugin(useGSAP);
 
@@ -113,6 +114,12 @@ export default function BirthdayExperience() {
       clearTimeout(lockTimerRef.current);
     };
   }, []);
+
+  useEffect(() => {
+    if (phase === "hub") {
+      prefetchGiftVideo(content.videoSrc);
+    }
+  }, [phase]);
 
   useGSAP(
     () => {
@@ -388,6 +395,15 @@ export default function BirthdayExperience() {
 
       {phase === "hub" && (
         <div className="relative mx-auto flex min-h-dvh w-full max-w-3xl flex-col justify-center px-6 py-16">
+          <video
+            src={content.videoSrc}
+            preload="auto"
+            muted
+            playsInline
+            className="pointer-events-none absolute h-px w-px overflow-hidden opacity-0"
+            aria-hidden="true"
+            tabIndex={-1}
+          />
           <PartyDecor variant="hub" />
           <p className="hub-item relative z-10 mb-3 text-xs uppercase tracking-[0.28em] text-champagne opacity-0">
             For {content.recipientName}
