@@ -11,7 +11,9 @@ import { isViewExpired, remainingAccessMs } from "@/lib/view-access";
  */
 export default function RequireUnlock({ children }) {
   const router = useRouter();
-  const [ready, setReady] = useState(false);
+  const [ready, setReady] = useState(() =>
+    typeof window !== "undefined" ? isGiftUnlocked() : false
+  );
 
   useEffect(() => {
     let cancelled = false;
@@ -23,8 +25,13 @@ export default function RequireUnlock({ children }) {
         return;
       }
 
+      setReady(true);
+
       try {
-        const res = await fetch("/api/view");
+        const res = await fetch("/api/view", {
+          cache: "no-store",
+          signal: AbortSignal.timeout(5000),
+        });
         const data = await res.json();
         if (cancelled) return;
 
@@ -34,13 +41,12 @@ export default function RequireUnlock({ children }) {
           return;
         }
 
-        setReady(true);
         timer = setTimeout(() => {
           lockGiftSession();
           router.replace("/");
         }, remainingAccessMs(data.viewedAt));
       } catch {
-        if (!cancelled) setReady(true);
+        // Stay in the gift if the check is slow or unavailable.
       }
     }
 
@@ -54,7 +60,9 @@ export default function RequireUnlock({ children }) {
   if (!ready) {
     return (
       <div className="page-shell flex min-h-dvh items-center justify-center">
-        <p className="font-display text-2xl text-paper/70">Opening…</p>
+        <p className="font-display text-2xl text-paper/70" aria-busy="true">
+          Opening…
+        </p>
       </div>
     );
   }

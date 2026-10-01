@@ -101,18 +101,12 @@ export default function PhotoAlbum({ pages }) {
             }
           );
 
-          const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-
           gsap.set(spreads, { autoAlpha: 0, rotationY: 0, xPercent: 0 });
           if (spreads[0]) {
             gsap.set(spreads[0], { autoAlpha: 1 });
             if (!reduce) {
-              const firstPhotos = spreads[0].querySelectorAll(
-                isDesktop ? ".desktop-spread .polaroid-wrap" : ".mobile-spread .polaroid-wrap"
-              );
-              const firstNotes = spreads[0].querySelectorAll(
-                isDesktop ? ".desktop-spread .album-note" : ".mobile-spread .album-note"
-              );
+              const firstPhotos = spreads[0].querySelectorAll(".polaroid-wrap");
+              const firstNotes = spreads[0].querySelectorAll(".album-note");
               gsap.from(firstPhotos, {
                 y: 28,
                 opacity: 0,
@@ -153,13 +147,9 @@ export default function PhotoAlbum({ pages }) {
               return;
             }
 
-            const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
-            const polaroids = incoming.querySelectorAll(
-              isDesktop ? ".desktop-spread .polaroid-wrap" : ".mobile-spread .polaroid-wrap"
-            );
-            const note = incoming.querySelectorAll(
-              isDesktop ? ".desktop-spread .album-note" : ".mobile-spread .album-note"
-            );
+          const isDesktop = window.matchMedia("(min-width: 1024px)").matches;
+          const polaroids = incoming.querySelectorAll(".polaroid-wrap");
+          const note = incoming.querySelectorAll(".album-note");
             const mobile = !isDesktop;
 
             if (polaroids.length) gsap.set(polaroids, { opacity: 0, y: 20, scale: 0.96 });
@@ -332,7 +322,7 @@ export default function PhotoAlbum({ pages }) {
       <div className="hidden lg:block">
         <PartyDecor variant="album" />
       </div>
-      <header className="album-chrome relative z-20 flex items-center justify-between gap-4 px-3 pb-1 pt-[max(0.55rem,env(safe-area-inset-top))] sm:px-8 sm:pb-2 sm:pt-8">
+      <header className="album-chrome relative z-20 flex shrink-0 items-center justify-between gap-4 px-4 pb-1 pt-[max(0.55rem,env(safe-area-inset-top))] sm:px-8 sm:pb-2 sm:pt-5">
         <BackLink href="/" label="Back to gift" />
         <p className="text-sm text-champagne" aria-live="polite">
           {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
@@ -347,14 +337,14 @@ export default function PhotoAlbum({ pages }) {
         aria-label="Photo album"
         tabIndex={0}
       >
-        <div className="album-chrome hidden px-2 pb-2 pt-1 sm:block sm:pb-4">
-          <h1 className="font-display text-2xl leading-[1.1] text-paper sm:text-4xl">
+        <div className="album-chrome hidden shrink-0 px-2 pb-3 pt-1 lg:block">
+          <h1 className="font-display text-3xl leading-[1.1] text-paper xl:text-4xl">
             Memories
           </h1>
         </div>
 
         <div className="relative mx-auto flex min-h-0 w-full min-w-0 max-w-6xl flex-1 flex-col">
-          <div className="relative min-h-0 w-full min-w-0 flex-1 lg:min-h-[40rem]">
+          <div className="relative min-h-0 w-full min-w-0 flex-1">
             {albumPages.map((page, i) => (
               <div
                 key={page.id}
@@ -366,7 +356,6 @@ export default function PhotoAlbum({ pages }) {
               >
                 <AlbumSpread
                   page={page}
-                  isFirst={i === 0}
                   onOpenPhoto={openPhoto}
                 />
               </div>

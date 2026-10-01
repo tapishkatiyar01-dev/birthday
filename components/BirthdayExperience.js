@@ -71,8 +71,16 @@ export default function BirthdayExperience() {
     let cancelled = false;
 
     async function boot() {
+      const unlocked = isGiftUnlocked();
+      if (unlocked) {
+        setPhase("hub");
+      }
+
       try {
-        const res = await fetch("/api/view");
+        const res = await fetch("/api/view", {
+          cache: "no-store",
+          signal: AbortSignal.timeout(5000),
+        });
         const data = await res.json();
         if (cancelled) return;
 
@@ -93,8 +101,7 @@ export default function BirthdayExperience() {
         }
         setPhase("party");
       } catch {
-        if (!cancelled) {
-          // Allow local preview of the intro when MongoDB is not configured
+        if (!cancelled && !unlocked) {
           setPhase("party");
         }
       }
@@ -156,7 +163,7 @@ export default function BirthdayExperience() {
             "-=0.35"
           );
 
-          gsap.delayedCall(2, () => {
+          gsap.delayedCall(0.85, () => {
             setShowNext(true);
             gsap.fromTo(
               ".next-btn",
@@ -261,7 +268,7 @@ export default function BirthdayExperience() {
     setBusy(true);
     setError("");
     try {
-      const res = await fetch("/api/view", { method: "POST" });
+      const res = await fetch("/api/view", { method: "POST", cache: "no-store" });
       const data = await res.json();
 
       if (data.alreadyViewed) {

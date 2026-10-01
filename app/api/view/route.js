@@ -21,29 +21,23 @@ export async function POST() {
   try {
     const collection = await getViewCollection();
     const now = new Date();
+    const existing = await collection.findOne({ _id: VIEW_DOC_ID });
 
-    await collection.updateOne(
-      { _id: VIEW_DOC_ID },
-      { $setOnInsert: { viewed: false, viewedAt: null } },
-      { upsert: true }
-    );
-
-    const result = await collection.findOneAndUpdate(
-      { _id: VIEW_DOC_ID, viewed: false },
-      { $set: { viewed: true, viewedAt: now } },
-      { returnDocument: "after" }
-    );
-
-    const doc = result?.value ?? result;
-    if (doc) {
+    if (existing?.viewed) {
       return Response.json({
-        ok: true,
-        alreadyViewed: false,
-        viewedAt: doc.viewedAt ?? now,
+        ok: false,
+        alreadyViewed: true,
+        viewedAt: existing.viewedAt ?? null,
       });
     }
 
-    return Response.json({ ok: false, alreadyViewed: true });
+    await collection.updateOne(
+      { _id: VIEW_DOC_ID },
+      { $set: { viewed: true, viewedAt: now } },
+      { upsert: true }
+    );
+
+    return Response.json({ ok: true, alreadyViewed: false, viewedAt: now });
   } catch (error) {
     console.error("POST /api/view failed:", error);
     return Response.json(

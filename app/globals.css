@@ -141,22 +141,7 @@ button {
 }
 
 .album-book::after {
-  content: "";
-  position: absolute;
-  top: 8%;
-  bottom: 8%;
-  left: 50%;
-  width: 2px;
-  transform: translateX(-50%);
-  pointer-events: none;
-  background: linear-gradient(
-    180deg,
-    transparent,
-    rgba(14, 21, 32, 0.12) 18%,
-    rgba(14, 21, 32, 0.18) 50%,
-    rgba(14, 21, 32, 0.12) 82%,
-    transparent
-  );
+  display: none;
 }
 
 .album-mood-editorial::after,
