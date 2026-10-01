@@ -221,19 +221,6 @@ button {
   background: rgba(14, 21, 32, 0.1);
 }
 
-.photo-frame-inner--natural {
-  flex: none;
-}
-
-.photo-frame-inner--natural img {
-  position: static !important;
-  inset: auto !important;
-  width: 100% !important;
-  height: auto !important;
-  max-height: min(72dvh, 36rem);
-  object-fit: contain !important;
-}
-
 .frame-polaroid {
   background: var(--paper);
   padding: 0.5rem 0.5rem 1.45rem;
@@ -430,6 +417,26 @@ button {
 @media (max-width: 1023px) {
   .album-book::after {
     display: none;
+  }
+
+  .frame-polaroid {
+    padding: 0.28rem 0.28rem 0.62rem;
+  }
+
+  .frame-polaroid::before {
+    top: -0.22rem;
+    width: 2.35rem;
+    height: 0.55rem;
+  }
+
+  .mobile-album-note .note-card,
+  .mobile-album-note .note-sticky,
+  .mobile-album-note .note-lined,
+  .mobile-album-note .note-ticket,
+  .mobile-album-note .note-postcard,
+  .mobile-album-note .note-quote,
+  .mobile-album-note .note-ribbon {
+    padding: 0.5rem 0.7rem;
   }
 
   .clip-torn-left,

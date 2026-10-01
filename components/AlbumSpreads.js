@@ -10,42 +10,26 @@ function PhotoFrame({
   priority = false,
   onOpen,
   sizes,
-  natural = false,
 }) {
   return (
-    <div className={`polaroid-wrap w-full ${natural ? "" : "h-full"} ${className}`}>
-      <div className={natural ? "w-full" : "h-full w-full"} style={{ transform: tilt ? `rotate(${tilt}deg)` : undefined }}>
+    <div className={`polaroid-wrap h-full w-full ${className}`}>
+      <div className="h-full w-full" style={{ transform: tilt ? `rotate(${tilt}deg)` : undefined }}>
         <button
           type="button"
           onClick={() => onOpen(image)}
-          className={`photo-frame frame-${variant} group w-full cursor-pointer text-left ${natural ? "h-auto" : "h-full"}`}
+          className={`photo-frame frame-${variant} group h-full w-full cursor-pointer text-left`}
           aria-label={`Open ${image.alt}`}
         >
-          <span
-            className={`photo-frame-inner relative block w-full overflow-hidden ${
-              natural ? "photo-frame-inner--natural h-auto flex-none" : "h-full"
-            }`}
-          >
-            {natural ? (
-              // Native img keeps the real photo ratio on mobile (Next/Image fill cannot).
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
-                src={image.src}
-                alt={image.alt}
-                draggable={false}
-                className="block h-auto w-full object-contain object-center"
-              />
-            ) : (
-              <Image
-                src={image.src}
-                alt={image.alt}
-                fill
-                priority={priority}
-                sizes={sizes}
-                draggable={false}
-                className="object-contain object-center transition duration-200 ease-[cubic-bezier(.25,.46,.45,.94)] group-active:scale-[0.99]"
-              />
-            )}
+          <span className="photo-frame-inner relative block h-full w-full overflow-hidden">
+            <Image
+              src={image.src}
+              alt={image.alt}
+              fill
+              priority={priority}
+              sizes={sizes}
+              draggable={false}
+              className="object-contain object-center transition duration-200 ease-[cubic-bezier(.25,.46,.45,.94)] group-active:scale-[0.99]"
+            />
           </span>
         </button>
       </div>
@@ -61,7 +45,7 @@ function NoteCard({ page, variant = "plain", className = "" }) {
   return (
     <aside className={`album-note ${className}`}>
       <div className={`note-card note-${variant}`}>
-        <p className="font-display pb-1 text-[1.15rem] leading-[1.4] text-ink sm:text-[1.5rem]">
+        <p className="font-display pb-1 text-[0.95rem] leading-[1.3] text-ink sm:text-[1.5rem] sm:leading-[1.4]">
           {page.note || "A quiet page, waiting for its note."}
         </p>
       </div>
@@ -81,25 +65,38 @@ function Book({ children, mood = "paper", className = "" }) {
 
 function MobileSheet({ page, isFirst, onOpen, noteVariant = "sticky" }) {
   const photos = page.images;
+  const count = photos.length;
+  const gridClass =
+    count <= 1
+      ? "grid-cols-1 grid-rows-1"
+      : count === 2
+        ? "grid-cols-2 grid-rows-1"
+        : "grid-cols-2 grid-rows-2";
 
   return (
-    <div className="mobile-spread flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 py-3 lg:hidden">
-      <div className="flex flex-col gap-3">
+    <div className="mobile-spread flex h-full min-h-0 flex-1 flex-col gap-1.5 overflow-hidden px-2 py-2 lg:hidden">
+      <div className={`grid min-h-0 flex-1 gap-1.5 ${gridClass}`}>
         {photos.map((image, i) => (
-          <div key={image.src} className="relative w-full">
+          <div
+            key={image.src}
+            className={`relative min-h-0 ${count >= 3 && i === 2 ? "col-span-2" : ""}`}
+          >
             <PhotoFrame
-              natural
               image={image}
               variant="polaroid"
               tilt={0}
               priority={isFirst && i === 0}
               onOpen={onOpen}
-              sizes="92vw"
+              sizes="46vw"
             />
           </div>
         ))}
       </div>
-      <NoteCard page={page} variant={noteVariant} className="shrink-0" />
+      <NoteCard
+        page={page}
+        variant={noteVariant}
+        className="mobile-album-note max-h-[30%] shrink-0 overflow-y-auto"
+      />
     </div>
   );
 }
@@ -321,7 +318,7 @@ function LayoutFan({ page, isFirst, onOpen }) {
 
 function ClosingEnvelope({ note }) {
   return (
-    <Book mood="envelope" className="desktop-spread mobile-spread items-center justify-center overflow-y-auto px-4 py-6 sm:px-12">
+    <Book mood="envelope" className="desktop-spread mobile-spread items-center justify-center overflow-y-auto px-3 py-4 sm:px-12 sm:py-6">
       <div className="album-note w-full max-w-xl">
         <div className="envelope-card">
           <span className="envelope-flap" aria-hidden="true" />

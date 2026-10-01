@@ -333,7 +333,7 @@ export default function PhotoAlbum({ pages }) {
       <div className="hidden lg:block">
         <PartyDecor variant="album" />
       </div>
-      <header className="album-chrome relative z-20 flex items-center justify-between gap-4 px-5 pb-2 pt-[max(1.25rem,env(safe-area-inset-top))] sm:px-8 sm:pt-8">
+      <header className="album-chrome relative z-20 flex items-center justify-between gap-4 px-3 pb-1 pt-[max(0.55rem,env(safe-area-inset-top))] sm:px-8 sm:pb-2 sm:pt-8">
         <BackLink href="/" label="Back to gift" />
         <p className="text-sm text-champagne" aria-live="polite">
           {String(index + 1).padStart(2, "0")} / {String(total).padStart(2, "0")}
@@ -342,20 +342,20 @@ export default function PhotoAlbum({ pages }) {
 
       <div
         ref={stageRef}
-        className="album-stage relative z-10 flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-x-hidden px-3 sm:px-6"
+        className="album-stage relative z-10 flex min-h-0 w-full min-w-0 flex-1 flex-col overflow-hidden px-2 sm:px-6"
         role="region"
         aria-roledescription="carousel"
         aria-label="Photo album"
         tabIndex={0}
       >
-        <div className="album-chrome px-2 pb-2 pt-1 sm:pb-4">
+        <div className="album-chrome hidden px-2 pb-2 pt-1 sm:block sm:pb-4">
           <h1 className="font-display text-2xl leading-[1.1] text-paper sm:text-4xl">
             Memories
           </h1>
         </div>
 
         <div className="relative mx-auto min-h-0 w-full min-w-0 max-w-6xl flex-1">
-          <div className="relative h-full min-h-[22rem] min-w-0 w-full sm:min-h-[28rem] lg:min-h-[40rem]">
+          <div className="relative h-full min-h-0 min-w-0 w-full lg:min-h-[40rem]">
             {albumPages.map((page, i) => (
               <div
                 key={page.id}
@@ -397,7 +397,7 @@ export default function PhotoAlbum({ pages }) {
       </div>
 
       <nav
-        className="album-chrome relative z-30 flex w-full min-w-0 shrink-0 items-center gap-2 overflow-x-hidden border-t border-paper/10 bg-ink/80 px-3 pb-[max(0.9rem,env(safe-area-inset-bottom))] pt-3 backdrop-blur-sm sm:px-8 sm:pb-6 lg:justify-center"
+        className="album-chrome relative z-30 flex w-full min-w-0 shrink-0 items-center gap-2 overflow-x-hidden border-t border-paper/10 bg-ink/80 px-2 py-2 pb-[max(0.45rem,env(safe-area-inset-bottom))] backdrop-blur-sm sm:px-8 sm:pb-6 sm:pt-3 lg:justify-center"
         aria-label="Album pages"
       >
         <button
