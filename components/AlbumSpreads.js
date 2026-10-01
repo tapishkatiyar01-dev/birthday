@@ -28,7 +28,7 @@ function PhotoFrame({
               priority={priority}
               sizes={sizes}
               draggable={false}
-              className="object-cover transition duration-200 ease-[cubic-bezier(.25,.46,.45,.94)] group-hover:scale-[1.04] group-active:scale-[0.99]"
+              className="object-contain object-center transition duration-200 ease-[cubic-bezier(.25,.46,.45,.94)] group-active:scale-[0.99]"
             />
           </span>
         </button>
@@ -140,7 +140,7 @@ function LayoutFilm({ page, isFirst, onOpen }) {
       <div className="mobile-spread flex min-h-0 flex-1 flex-col gap-3 overflow-y-auto px-3 py-3 lg:hidden">
         <div className="film-strip mx-auto flex w-full max-w-sm gap-2 overflow-x-auto p-2">
           {page.images.map((image, i) => (
-            <div key={image.src} className="relative h-40 w-28 shrink-0">
+            <div key={image.src} className="relative h-44 w-36 shrink-0">
               <PhotoFrame
                 image={image}
                 variant="film"
@@ -180,38 +180,36 @@ function LayoutTorn({ page, isFirst, onOpen }) {
   return (
     <Book mood="torn" className="lg:px-6 lg:py-6">
       <MobileSheet page={page} isFirst={isFirst} onOpen={onOpen} noteVariant="ticket" />
-      <div className="desktop-spread relative hidden min-h-0 flex-1 lg:block">
-        <div className="grid h-full min-h-[28rem] grid-cols-2">
+      <div className="desktop-spread relative hidden min-h-0 flex-1 flex-col lg:flex">
+        <div className="grid min-h-0 flex-1 grid-cols-2 gap-6 px-8 pt-8">
           {a ? (
-            <div className="relative min-h-0 overflow-hidden">
-              <div className="absolute inset-0 clip-torn-left">
-                <PhotoFrame
-                  image={a}
-                  variant="flush"
-                  priority={isFirst}
-                  onOpen={onOpen}
-                  sizes="45vw"
-                />
-              </div>
+            <div className="relative min-h-0">
+              <PhotoFrame
+                image={a}
+                variant="polaroid"
+                tilt={-3}
+                priority={isFirst}
+                onOpen={onOpen}
+                sizes="40vw"
+              />
             </div>
           ) : null}
           {b ? (
-            <div className="relative min-h-0 overflow-hidden">
-              <div className="absolute inset-0 clip-torn-right">
-                <PhotoFrame
-                  image={b}
-                  variant="flush"
-                  onOpen={onOpen}
-                  sizes="45vw"
-                />
-              </div>
+            <div className="relative min-h-0">
+              <PhotoFrame
+                image={b}
+                variant="polaroid"
+                tilt={3}
+                onOpen={onOpen}
+                sizes="40vw"
+              />
             </div>
           ) : null}
         </div>
         <NoteCard
           page={page}
           variant="ticket"
-          className="absolute bottom-8 left-1/2 z-[3] flex w-[min(28rem,70%)] -translate-x-1/2 justify-center"
+          className="flex w-full justify-center px-8 pb-8 pt-4"
         />
       </div>
     </Book>
@@ -230,7 +228,7 @@ function LayoutStamp({ page, isFirst, onOpen }) {
             <div className="absolute left-[8%] top-[6%] z-[1] h-[72%] w-[58%]">
               <PhotoFrame
                 image={a}
-                variant="circle"
+                variant="polaroid"
                 tilt={-4}
                 priority={isFirst}
                 onOpen={onOpen}
@@ -263,10 +261,10 @@ function LayoutMagazine({ page, isFirst, onOpen }) {
       <MobileSheet page={page} isFirst={isFirst} onOpen={onOpen} noteVariant="quote" />
       <div className="desktop-spread relative hidden min-h-0 flex-1 lg:block">
         {a ? (
-          <div className="absolute inset-0">
+          <div className="absolute inset-6">
             <PhotoFrame
               image={a}
-              variant="flush"
+              variant="polaroid"
               priority={isFirst}
               onOpen={onOpen}
               sizes="70vw"

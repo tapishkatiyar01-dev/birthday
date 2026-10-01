@@ -218,6 +218,12 @@ button {
 .photo-frame-inner {
   min-height: 0;
   flex: 1;
+  background: rgba(14, 21, 32, 0.1);
+}
+
+.photo-frame-inner img {
+  object-fit: contain !important;
+  object-position: center;
 }
 
 .frame-polaroid {
